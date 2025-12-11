@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Pasión: Música y Gol</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const TOTAL_ROUNDS = 10;
+        const TIMER_DURATION = 20;
+
+        const questionBank = {
+          musica: {
+            paraBurros: [
+              { q: "¿Quién fue el líder de Soda Stereo?", a: ["Gustavo Cerati", "Charly García", "Fito Páez"], c: 0 },
+              { q: "¿De qué banda era líder Luca Prodan?", a: ["Sumo", "Los Redondos", "Divididos"], c: 0 },
+              { q: "¿Quién canta 'Los Dinosaurios'?", a: ["Charly García", "Luis Alberto Spinetta", "León Gieco"], c: 0 },
+              { q: "¿Qué banda formó Indio Solari?", a: ["Patricio Rey y Redonditos", "Los Piojos", "La Renga"], c: 0 },
+              { q: "¿Quién fue el vocalista de Queen?", a: ["Freddie Mercury", "David Bowie", "Elton John"], c: 0 },
+              { q: "¿De qué país es U2?", a: ["Irlanda", "Inglaterra", "Estados Unidos"], c: 0 },
+              { q: "¿Quién es el Rey del Pop?", a: ["Michael Jackson", "Prince", "Elvis Presley"], c: 0 },
+              { q: "¿Quién lanzó 'Purple Rain'?", a: ["Prince", "Michael Jackson", "George Michael"], c: 0 },
+              { q: "¿Quién es la Reina del Pop?", a: ["Madonna", "Whitney Houston", "Janet Jackson"], c: 0 },
+              { q: "¿Quién canta 'Uptown Funk'?", a: ["Bruno Mars", "Justin Timberlake", "Pharrell"], c: 0 }
+            ],
+            gentePromedio: [
+              { q: "¿En qué año se separó Soda Stereo?", a: ["1997", "1995", "1999"], c: 0 },
+              { q: "¿Cuál fue el último álbum de Soda?", a: ["Sueño Stereo", "Canción Animal", "Dynamo"], c: 0 },
+              { q: "¿En qué año murió Kurt Cobain?", a: ["1994", "1992", "1996"], c: 0 },
+              { q: "¿En qué año se lanzó Thriller?", a: ["1982", "1984", "1980"], c: 0 },
+              { q: "¿En qué año murió Prince?", a: ["2016", "2014", "2018"], c: 0 }
+            ],
+            siQueSaben: [
+              { q: "¿Qué inspiró el nombre Patricio Rey?", a: ["Es ficticio", "Leopoldo Marechal", "Julio Cortázar"], c: 0 },
+              { q: "¿Primer álbum solista de Spinetta?", a: ["Artaud", "Kamikaze", "Téster de Violencia"], c: 0 },
+              { q: "¿Quién produjo Canción Animal?", a: ["Gustavo Cerati", "Carlos Alomar", "Mariano López"], c: 0 },
+              { q: "¿Quién fue el quinto Beatle?", a: ["George Martin", "Pete Best", "Brian Epstein"], c: 0 },
+              { q: "¿Primer video en MTV?", a: ["Video Killed Radio Star", "Thriller", "Like a Virgin"], c: 0 }
+            ]
+          },
+          futbol: {
+            paraBurros: [
+              { q: "¿De qué país es Messi?", a: ["Argentina", "Brasil", "Uruguay"], c: 0 },
+              { q: "¿En qué club español jugó más Cristiano?", a: ["Real Madrid", "Barcelona", "Atlético Madrid"], c: 0 },
+              { q: "¿Qué argentino ganó el Mundial 1986?", a: ["Diego Maradona", "Lionel Messi", "Mario Kempes"], c: 0 },
+              { q: "¿De qué país es Neymar?", a: ["Brasil", "Argentina", "Portugal"], c: 0 },
+              { q: "¿Quién fue DT de Argentina en 2022?", a: ["Lionel Scaloni", "Jorge Sampaoli", "Alejandro Sabella"], c: 0 },
+              { q: "¿Qué DT dirigió a Argentina en 1986?", a: ["Carlos Bilardo", "César Luis Menotti", "Marcelo Bielsa"], c: 0 },
+              { q: "¿De qué país es el club Barcelona?", a: ["España", "Italia", "Portugal"], c: 0 },
+              { q: "¿Qué club argentino tiene más Libertadores?", a: ["Independiente", "Boca Juniors", "River Plate"], c: 0 },
+              { q: "¿Qué club tiene más Champions?", a: ["Real Madrid", "AC Milan", "Barcelona"], c: 0 },
+              { q: "¿De qué país es el Bayern Munich?", a: ["Alemania", "Austria", "Suiza"], c: 0 }
+            ],
+            gentePromedio: [
+              { q: "¿En qué año ganó Messi su primer Balón de Oro?", a: ["2009", "2008", "2010"], c: 0 },
+              { q: "¿Cuántos goles hizo Maradona en el Mundial 86?", a: ["5", "6", "4"], c: 0 },
+              { q: "¿Qué brasileño ganó 3 mundiales?", a: ["Pelé", "Ronaldo", "Romário"], c: 0 },
+              { q: "¿Cuántas Champions ganó Pep con Barça?", a: ["2", "3", "1"], c: 0 },
+              { q: "¿En qué año se fundó River Plate?", a: ["1901", "1905", "1898"], c: 0 }
+            ],
+            siQueSaben: [
+              { q: "¿En qué año debutó Maradona en Primera?", a: ["1976", "1975", "1977"], c: 0 },
+              { q: "¿Cuántos goles oficiales tiene Pelé?", a: ["757", "1000", "1283"], c: 0 },
+              { q: "¿Primer ganador del Balón de Oro?", a: ["Stanley Matthews", "Di Stéfano", "Raymond Kopa"], c: 0 },
+              { q: "¿En qué año se fundó la UEFA?", a: ["1954", "1950", "1958"], c: 0 },
+              { q: "¿Años que Ferguson dirigió al United?", a: ["27", "25", "30"], c: 0 }
+            ]
+          }
+        };
+
+        function App() {
+          const [gameState, setGameState] = useState('setup');
+          const [players, setPlayers] = useState([]);
+          const [newPlayerName, setNewPlayerName] = useState('');
+          const [difficulty, setDifficulty] = useState('');
+          const [currentRound, setCurrentRound] = useState(0);
+          const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+          const [currentQuestion, setCurrentQuestion] = useState(null);
+          const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+          const [selectedAnswer, setSelectedAnswer] = useState(null);
+          const [showAnswer, setShowAnswer] = useState(false);
+          const [usedQuestions, setUsedQuestions] = useState([]);
+          const [streak, setStreak] = useState({});
+
+          useEffect(() => {
+            if (gameState === 'playing' && !showAnswer && timeLeft > 0) {
+              const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+              return () => clearTimeout(timer);
+            }
+            if (timeLeft === 0 && !showAnswer) {
+              handleTimeout();
+            }
+          }, [timeLeft, gameState, showAnswer]);
+
+          const addPlayer = () => {
+            if (newPlayerName.trim()) {
+              setPlayers([...players, { name: newPlayerName.trim(), score: 0, correct: 0, total: 0 }]);
+              setNewPlayerName('');
+            }
+          };
+
+          const startGame = () => {
+            if (players.length > 0 && difficulty) {
+              const initialStreak = {};
+              players.forEach(p => initialStreak[p.name] = 0);
+              setStreak(initialStreak);
+              setGameState('playing');
+              nextQuestion();
+            }
+          };
+
+          const nextQuestion = () => {
+            const category = currentRound % 2 === 0 ? 'musica' : 'futbol';
+            const questions = questionBank[category][difficulty];
+            const availableQuestions = questions.filter((_, idx) => !usedQuestions.includes(`${category}-${difficulty}-${idx}`));
+            
+            if (availableQuestions.length === 0) {
+              setUsedQuestions([]);
+              return nextQuestion();
+            }
+
+            const randomQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+            const questionId = `${category}-${difficulty}-${questions.indexOf(randomQuestion)}`;
+            
+            const correctAnswer = randomQuestion.a[randomQuestion.c];
+            const shuffledAnswers = [...randomQuestion.a].sort(() => Math.random() - 0.5);
+            const newCorrectIndex = shuffledAnswers.indexOf(correctAnswer);
+            
+            const shuffledQuestion = {
+              ...randomQuestion,
+              a: shuffledAnswers,
+              c: newCorrectIndex
+            };
+            
+            setCurrentQuestion(shuffledQuestion);
+            setUsedQuestions([...usedQuestions, questionId]);
+            setTimeLeft(TIMER_DURATION);
+            setSelectedAnswer(null);
+            setShowAnswer(false);
+          };
+
+          const handleAnswer = (answerIndex) => {
+            if (showAnswer) return;
+            
+            setSelectedAnswer(answerIndex);
+            setShowAnswer(true);
+
+            const isCorrect = answerIndex === currentQuestion.c;
+            const timeBonus = timeLeft > 15 ? 3 : timeLeft > 10 ? 2 : 1;
+
+            const newPlayers = [...players];
+            const currentPlayer = newPlayers[currentPlayerIndex];
+            
+            currentPlayer.total++;
+            
+            if (isCorrect) {
+              currentPlayer.correct++;
+              const currentStreak = streak[currentPlayer.name] || 0;
+              const newStreak = timeLeft > 15 ? currentStreak + 1 : 0;
+              
+              let points = timeBonus;
+              if (newStreak === 3 && timeLeft > 15) {
+                points = 6;
+                setStreak({ ...streak, [currentPlayer.name]: 0 });
+              } else {
+                setStreak({ ...streak, [currentPlayer.name]: newStreak });
+              }
+              
+              currentPlayer.score += points;
+            } else {
+              setStreak({ ...streak, [currentPlayer.name]: 0 });
+            }
+
+            setPlayers(newPlayers);
+            setTimeout(() => moveToNextTurn(), 3000);
+          };
+
+          const handleTimeout = () => {
+            setShowAnswer(true);
+            const newPlayers = [...players];
+            newPlayers[currentPlayerIndex].total++;
+            setPlayers(newPlayers);
+            setStreak({ ...streak, [players[currentPlayerIndex].name]: 0 });
+            setTimeout(() => moveToNextTurn(), 3000);
+          };
+
+          const moveToNextTurn = () => {
+            const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            
+            if (nextPlayerIndex === 0) {
+              const nextRound = currentRound + 1;
+              if (nextRound >= TOTAL_ROUNDS) {
+                setGameState('results');
+                return;
+              }
+              setCurrentRound(nextRound);
+            }
+
+            setCurrentPlayerIndex(nextPlayerIndex);
+            nextQuestion();
+          };
+
+          const resetGame = () => {
+            setGameState('setup');
+            setPlayers([]);
+            setCurrentRound(0);
+            setCurrentPlayerIndex(0);
+            setUsedQuestions([]);
+            setDifficulty('');
+          };
+
+          if (gameState === 'setup') {
+            return (
+              <div className="min-h-screen p-8 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-12">
+                    <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                      Trivia Pasión: Música y Gol
+                    </h1>
+                    <div className="flex justify-center gap-8 mt-6">
+                      <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur">
+                        <span className="text-4xl">🎸</span>
+                        <span className="text-white font-bold text-xl">Música</span>
+                      </div>
+                      <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur">
+                        <span className="text-4xl">⚽</span>
+                        <span className="text-white font-bold text-xl">Fútbol</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
+                    <h2 className="text-3xl font-bold mb-6 text-purple-900 flex items-center gap-3">
+                      <span className="text-4xl">👥</span>
+                      Jugadores
+                    </h2>
+                    
+                    <div className="flex gap-3 mb-6">
+                      <input
+                        type="text"
+                        value={newPlayerName}
+                        onChange={(e) => setNewPlayerName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addPlayer()}
+                        placeholder="Nombre del jugador"
+                        className="flex-1 px-4 py-3 border-2 border-purple-300 rounded-xl focus:outline-none focus:border-purple-500 text-lg"
+                      />
+                      <button
+                        onClick={addPlayer}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                      >
+                        Agregar
+                      </button>
+                    </div>
+
+                    {players.length > 0 && (
+                      <div className="space-y-2 mb-6">
+                        {players.map((player, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-3 rounded-xl">
+                            <span className="font-bold text-purple-900 text-lg">
+                              {idx + 1}. {player.name}
+                            </span>
+                            <button
+                              onClick={() => setPlayers(players.filter((_, i) => i !== idx))}
+                              className="text-red-500 hover:text-red-700 font-bold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
+                    <h2 className="text-3xl font-bold mb-6 text-purple-900 flex items-center gap-3">
+                      <span className="text-4xl">🏆</span>
+                      Nivel de Dificultad
+                    </h2>
+                    
+                    <div className="grid gap-4">
+                      {[
+                        { value: 'paraBurros', label: 'Para Burros', desc: 'Nivel fácil' },
+                        { value: 'gentePromedio', label: 'Gente Promedio', desc: 'Nivel intermedio' },
+                        { value: 'siQueSaben', label: 'Si Que Saben!!!', desc: 'Nivel difícil' }
+                      ].map(level => (
+                        <button
+                          key={level.value}
+                          onClick={() => setDifficulty(level.value)}
+                          className={`p-6 rounded-xl border-4 transition-all text-left ${
+                            difficulty === level.value
+                              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-purple-800 scale-105'
+                              : 'bg-white border-purple-300 hover:border-purple-500'
+                          }`}
+                        >
+                          <div className="text-2xl font-bold mb-1">{level.label}</div>
+                          <div className={`text-sm ${difficulty === level.value ? 'text-purple-100' : 'text-gray-600'}`}>
+                            {level.desc}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {players.length > 0 && difficulty && (
+                    <button
+                      onClick={startGame}
+                      className="w-full py-6 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-3xl font-bold text-3xl hover:scale-105 transition-transform shadow-2xl flex items-center justify-center gap-4"
+                    >
+                      <span className="text-5xl">▶️</span>
+                      ¡COMENZAR JUEGO!
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          }
+
+          return <div className="min-h-screen flex items-center justify-center bg-purple-600 text-white text-2xl">Cargando...</div>;
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

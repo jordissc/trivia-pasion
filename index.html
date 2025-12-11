@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Pasión: Música y Gol</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const TOTAL_ROUNDS = 10;
+        const TIMER_DURATION = 20;
+
+        const questionBank = {
+musica: {
+            paraBurros: [
+              { q: "¿Quién fue el líder de Soda Stereo?", a: ["Gustavo Cerati", "Charly García", "Fito Páez"], c: 0 },
+              { q: "¿De qué banda era líder Luca Prodan?", a: ["Sumo", "Los Redondos", "Divididos"], c: 0 },
+              { q: "¿Quién canta 'Los Dinosaurios'?", a: ["Charly García", "Luis Alberto Spinetta", "León Gieco"], c: 0 },
+              { q: "¿Qué banda formó Indio Solari?", a: ["Patricio Rey y Redonditos", "Los Piojos", "La Renga"], c: 0 },
+              { q: "¿Quién es el baterista de Los Fabulosos Cadillacs?", a: ["Fernando Ricciardi", "Vicentico", "Flavio Cianciarulo"], c: 0 },
+              { q: "¿Qué banda lideró Pappo?", a: ["Pappo's Blues", "Manal", "Almendra"], c: 0 },
+              { q: "¿De qué ciudad es La Renga?", a: ["Buenos Aires", "Rosario", "Córdoba"], c: 0 },
+              { q: "¿Quién canta 'Seminare'?", a: ["Los Piojos", "La Renga", "Divididos"], c: 0 },
+              { q: "¿Qué instrumento tocaba Spinetta?", a: ["Guitarra", "Bajo", "Batería"], c: 0 },
+              { q: "¿Cuál es el nombre real de Vicentico?", a: ["Gabriel Fernández Capello", "Vicente López", "Vicente Fernández"], c: 0 },
+              { q: "¿Quién fue el vocalista de Queen?", a: ["Freddie Mercury", "David Bowie", "Elton John"], c: 0 },
+              { q: "¿De qué país es U2?", a: ["Irlanda", "Inglaterra", "Estados Unidos"], c: 0 },
+              { q: "¿Quién canta 'Livin on a Prayer'?", a: ["Bon Jovi", "Guns N Roses", "Def Leppard"], c: 0 },
+              { q: "¿Qué banda hizo 'Sweet Child O Mine'?", a: ["Guns N Roses", "Aerosmith", "Bon Jovi"], c: 0 },
+              { q: "¿Quién es el guitarrista de U2?", a: ["The Edge", "Slash", "Jimmy Page"], c: 0 },
+              { q: "¿Qué banda lanzó 'Don't Look Back in Anger'?", a: ["Oasis", "Blur", "Pulp"], c: 0 },
+              { q: "¿De qué ciudad son Red Hot Chili Peppers?", a: ["Los Ángeles", "Seattle", "Nueva York"], c: 0 },
+              { q: "¿Quién es el vocalista de Foo Fighters?", a: ["Dave Grohl", "Kurt Cobain", "Eddie Vedder"], c: 0 },
+              { q: "¿Qué banda lanzó 'The Joshua Tree'?", a: ["U2", "R.E.M.", "INXS"], c: 0 },
+              { q: "¿Quién canta 'November Rain'?", a: ["Guns N Roses", "Bon Jovi", "Aerosmith"], c: 0 },
+              { q: "¿Quién es el Rey del Pop?", a: ["Michael Jackson", "Prince", "Elvis Presley"], c: 0 },
+              { q: "¿Quién lanzó 'Purple Rain'?", a: ["Prince", "Michael Jackson", "George Michael"], c: 0 },
+              { q: "¿De qué grupo fue George Michael?", a: ["Wham!", "Duran Duran", "Culture Club"], c: 0 },
+              { q: "¿Quién canta 'Billie Jean'?", a: ["Michael Jackson", "Lionel Richie", "Stevie Wonder"], c: 0 },
+              { q: "¿Quién es la Reina del Pop?", a: ["Madonna", "Whitney Houston", "Janet Jackson"], c: 0 }
+            ],
+            gentePromedio: [
+              { q: "¿En qué año se separó Soda Stereo?", a: ["1997", "1995", "1999"], c: 0 },
+              { q: "¿Cuál fue el último álbum de Soda?", a: ["Sueño Stereo", "Canción Animal", "Dynamo"], c: 0 },
+              { q: "¿En qué año murió Luca Prodan?", a: ["1987", "1985", "1989"], c: 0 },
+              { q: "¿En qué año murió Kurt Cobain?", a: ["1994", "1992", "1996"], c: 0 },
+              { q: "¿Cuál fue el primer álbum de Nirvana?", a: ["Bleach", "Nevermind", "In Utero"], c: 0 },
+              { q: "¿En qué año se separaron los Beatles?", a: ["1970", "1968", "1972"], c: 0 },
+              { q: "¿En qué año se lanzó Thriller?", a: ["1982", "1984", "1980"], c: 0 },
+              { q: "¿Quién produjo Thriller de MJ?", a: ["Quincy Jones", "Phil Spector", "George Martin"], c: 0 },
+              { q: "¿Cuál fue el primer éxito de Madonna?", a: ["Holiday", "Like a Virgin", "Material Girl"], c: 0 },
+              { q: "¿En qué año murió Prince?", a: ["2016", "2014", "2018"], c: 0 },
+              { q: "¿Qué banda canta 'De Música Ligera'?", a: ["Soda Stereo", "Hombres G", "Los Enanitos Verdes"], c: 0 },
+              { q: "¿En qué año se formó Sumo?", a: ["1981", "1983", "1979"], c: 0 },
+              { q: "¿Quién fue el bajista de Almendra?", a: ["Emilio del Guercio", "Pomo Lorenzo", "Rodolfo García"], c: 0 },
+              { q: "¿En qué año se formó Serú Girán?", a: ["1978", "1976", "1980"], c: 0 },
+              { q: "¿Quién fue el baterista de Soda Stereo?", a: ["Charly Alberti", "Zeta Bosio", "Gustavo Cerati"], c: 0 },
+              { q: "¿En qué año se lanzó 'Wonderwall'?", a: ["1995", "1994", "1996"], c: 0 },
+              { q: "¿Qué banda hizo 'Black Hole Sun'?", a: ["Soundgarden", "Pearl Jam", "Alice in Chains"], c: 0 },
+              { q: "¿Cuál fue el primer álbum de Pearl Jam?", a: ["Ten", "Vs.", "Vitalogy"], c: 0 },
+              { q: "¿En qué año se formó Radiohead?", a: ["1985", "1987", "1990"], c: 0 },
+              { q: "¿Qué banda hizo 'Lithium'?", a: ["Nirvana", "Foo Fighters", "Stone Temple Pilots"], c: 0 },
+              { q: "¿Cuál fue el último álbum de The Beatles?", a: ["Let It Be", "Abbey Road", "The White Album"], c: 0 },
+              { q: "¿En qué año murió Jimi Hendrix?", a: ["1970", "1969", "1971"], c: 0 },
+              { q: "¿Qué banda hizo 'Even Flow'?", a: ["Pearl Jam", "Nirvana", "Soundgarden"], c: 0 },
+              { q: "¿En qué año se formó The Rolling Stones?", a: ["1962", "1960", "1964"], c: 0 },
+              { q: "¿Qué banda hizo 'Roxanne'?", a: ["The Police", "The Clash", "The Jam"], c: 0 }
+            ],
+            siQueSaben: [
+              { q: "¿Qué inspiró el nombre Patricio Rey?", a: ["Es ficticio", "Leopoldo Marechal", "Julio Cortázar"], c: 0 },
+              { q: "¿Primer álbum solista de Spinetta?", a: ["Artaud", "Kamikaze", "Téster de Violencia"], c: 0 },
+              { q: "¿Quién produjo Canción Animal?", a: ["Gustavo Cerati", "Carlos Alomar", "Mariano López"], c: 0 },
+              { q: "¿Año del último show de Soda antes de separarse?", a: ["1997", "1996", "1998"], c: 0 },
+              { q: "¿Banda de Charly con Nito Mestre?", a: ["Sui Generis", "La Máquina", "Serú Girán"], c: 0 },
+              { q: "¿Disco de Spinetta grabado en una noche?", a: ["Privé", "Kamikaze", "Pelusón of Milk"], c: 0 },
+              { q: "¿En qué ciudad nació Luca Prodan?", a: ["Roma", "Escocia", "Londres"], c: 0 },
+              { q: "¿Primer álbum de Pescado Rabioso?", a: ["Desatormentándonos", "Pescado Rabioso", "Artaud"], c: 0 },
+              { q: "¿En qué año debutó Soda Stereo?", a: ["1984", "1982", "1986"], c: 0 },
+              { q: "¿Quién fue el quinto Beatle?", a: ["George Martin", "Pete Best", "Brian Epstein"], c: 0 },
+              { q: "¿Guitarrista que influenció a Clapton y Page?", a: ["Robert Johnson", "Muddy Waters", "B.B. King"], c: 0 },
+              { q: "¿Primer álbum conceptual de Pink Floyd?", a: ["The Piper at the Gates of Dawn", "Dark Side", "The Wall"], c: 0 },
+              { q: "¿Banda de Seattle que precedió al grunge?", a: ["The Melvins", "Nirvana", "Soundgarden"], c: 0 },
+              { q: "¿Álbum de Led Zeppelin con Kashmir?", a: ["Physical Graffiti", "Led Zeppelin IV", "Houses of the Holy"], c: 0 },
+              { q: "¿Productor de Nevermind?", a: ["Butch Vig", "Steve Albini", "Rick Rubin"], c: 0 },
+              { q: "¿Nombre original de Queen?", a: ["Smile", "The Reaction", "Queen"], c: 0 },
+              { q: "¿Baterista original de The Who?", a: ["Keith Moon", "John Bonham", "Ginger Baker"], c: 0 },
+              { q: "¿Álbum de Radiohead paga lo que quieras?", a: ["In Rainbows", "Kid A", "OK Computer"], c: 0 },
+              { q: "¿En qué año se formó Velvet Underground?", a: ["1964", "1966", "1962"], c: 0 },
+              { q: "¿Quién dirigió el video Thriller?", a: ["John Landis", "Martin Scorsese", "Steven Spielberg"], c: 0 },
+              { q: "¿Quién creó el slap bass moderno?", a: ["Larry Graham", "Bootsy Collins", "Flea"], c: 0 },
+              { q: "¿Nombre original de Chic?", a: ["Allah & Knife Wielding Punks", "Big Apple Band", "Chic"], c: 0 },
+              { q: "¿Quién produjo Parliament-Funkadelic?", a: ["George Clinton", "Bootsy Collins", "Bernie Worrell"], c: 0 },
+              { q: "¿Año de Papas Got a Brand New Bag?", a: ["1965", "1967", "1963"], c: 0 },
+              { q: "¿Primer video en MTV?", a: ["Video Killed Radio Star", "Thriller", "Like a Virgin"], c: 0 }
+            ]
+          },
+futbol: {
+            paraBurros: [
+              { q: "¿De qué país es Messi?", a: ["Argentina", "Brasil", "Uruguay"], c: 0 },
+              { q: "¿En qué club español jugó más Cristiano?", a: ["Real Madrid", "Barcelona", "Atlético Madrid"], c: 0 },
+              { q: "¿Qué argentino ganó el Mundial 1986?", a: ["Diego Maradona", "Lionel Messi", "Mario Kempes"], c: 0 },
+              { q: "¿De qué país es Neymar?", a: ["Brasil", "Argentina", "Portugal"], c: 0 },
+              { q: "¿En qué posición juega Messi?", a: ["Delantero", "Mediocampista", "Defensor"], c: 0 },
+              { q: "¿Qué francés ganó el Mundial 1998?", a: ["Zinedine Zidane", "Thierry Henry", "Michel Platini"], c: 0 },
+              { q: "¿De qué país es Zlatan Ibrahimovic?", a: ["Suecia", "Dinamarca", "Noruega"], c: 0 },
+              { q: "¿En qué club italiano jugó Maradona?", a: ["Napoli", "Juventus", "AC Milan"], c: 0 },
+              { q: "¿Qué arquero alemán es leyenda del Bayern?", a: ["Oliver Kahn", "Manuel Neuer", "Jens Lehmann"], c: 0 },
+              { q: "¿De qué país es Sergio Agüero?", a: ["Argentina", "Uruguay", "Chile"], c: 0 },
+              { q: "¿Quién fue DT de Argentina en 2022?", a: ["Lionel Scaloni", "Jorge Sampaoli", "Alejandro Sabella"], c: 0 },
+              { q: "¿Qué DT dirigió a Argentina en 1986?", a: ["Carlos Bilardo", "César Luis Menotti", "Marcelo Bielsa"], c: 0 },
+              { q: "¿Quién es el DT más exitoso del Barcelona?", a: ["Pep Guardiola", "Johan Cruyff", "Luis Enrique"], c: 0 },
+              { q: "¿Qué DT ganó más Champions League?", a: ["Carlo Ancelotti", "Pep Guardiola", "Alex Ferguson"], c: 0 },
+              { q: "¿De qué país es José Mourinho?", a: ["Portugal", "España", "Italia"], c: 0 },
+              { q: "¿Quién dirigió a Francia en el Mundial 1998?", a: ["Aimé Jacquet", "Didier Deschamps", "Raymond Domenech"], c: 0 },
+              { q: "¿Qué DT argentino es famoso por su estilo ofensivo?", a: ["Marcelo Bielsa", "Diego Simeone", "Mauricio Pochettino"], c: 0 },
+              { q: "¿Quién dirigió al Real Madrid en La Décima?", a: ["Carlo Ancelotti", "José Mourinho", "Zinedine Zidane"], c: 0 },
+              { q: "¿Qué DT ganó el Mundial con Alemania en 2014?", a: ["Joachim Löw", "Jürgen Klinsmann", "Franz Beckenbauer"], c: 0 },
+              { q: "¿De qué país es Diego Simeone?", a: ["Argentina", "Uruguay", "Italia"], c: 0 },
+              { q: "¿De qué país es el club Barcelona?", a: ["España", "Italia", "Portugal"], c: 0 },
+              { q: "¿Qué club argentino tiene más Libertadores?", a: ["Independiente", "Boca Juniors", "River Plate"], c: 0 },
+              { q: "¿De qué ciudad es el Manchester United?", a: ["Manchester", "Londres", "Liverpool"], c: 0 },
+              { q: "¿Qué club tiene más Champions League?", a: ["Real Madrid", "AC Milan", "Barcelona"], c: 0 },
+              { q: "¿De qué color es la camiseta del Boca Juniors?", a: ["Azul y oro", "Rojo y blanco", "Verde y blanco"], c: 0 }
+            ],
+            gentePromedio: [
+              { q: "¿En qué año ganó Messi su primer Balón de Oro?", a: ["2009", "2008", "2010"], c: 0 },
+              { q: "¿Cuántos goles hizo Maradona en el Mundial 1986?", a: ["5", "6", "4"], c: 0 },
+              { q: "¿Qué jugador brasileño ganó 3 mundiales?", a: ["Pelé", "Ronaldo", "Romário"], c: 0 },
+              { q: "¿En qué club debutó Cristiano Ronaldo?", a: ["Sporting Lisboa", "Manchester United", "Real Madrid"], c: 0 },
+              { q: "¿Cuántos goles hizo Ronaldo Brasil en mundiales?", a: ["15", "13", "17"], c: 0 },
+              { q: "¿Qué jugador marcó el Gol del Siglo en 1986?", a: ["Diego Maradona", "Pelé", "Zinedine Zidane"], c: 0 },
+              { q: "¿En qué año se retiró Zinedine Zidane?", a: ["2006", "2008", "2004"], c: 0 },
+              { q: "¿Qué argentino jugó en Napoli después de Maradona?", a: ["Gonzalo Higuaín", "Ezequiel Lavezzi", "Mauro Icardi"], c: 0 },
+              { q: "¿Cuántos Balones de Oro ganó Cristiano Ronaldo?", a: ["5", "4", "6"], c: 0 },
+              { q: "¿Qué jugador español es máximo goleador histórico?", a: ["David Villa", "Fernando Torres", "Raúl González"], c: 0 },
+              { q: "¿Cuántas Champions ganó Pep Guardiola con Barcelona?", a: ["2", "3", "1"], c: 0 },
+              { q: "¿En qué año Mourinho ganó la Champions con Porto?", a: ["2004", "2003", "2005"], c: 0 },
+              { q: "¿Qué DT dirigió a Italia en el Mundial 2006?", a: ["Marcello Lippi", "Cesare Prandelli", "Antonio Conte"], c: 0 },
+              { q: "¿Cuántos mundiales ganó como DT Carlos Bilardo?", a: ["1", "2", "0"], c: 0 },
+              { q: "¿Qué DT ganó la Premier League invicto con Arsenal?", a: ["Arsène Wenger", "José Mourinho", "Alex Ferguson"], c: 0 },
+              { q: "¿En qué año Guardiola dejó el Barcelona?", a: ["2012", "2013", "2011"], c: 0 },
+              { q: "¿Qué DT argentino dirigió al Athletic Bilbao?", a: ["Marcelo Bielsa", "Diego Simeone", "Mauricio Pochettino"], c: 0 },
+              { q: "¿Cuántas Champions ganó Zidane como DT del Real Madrid?", a: ["3", "2", "4"], c: 0 },
+              { q: "¿En qué año Simeone asumió en el Atlético Madrid?", a: ["2011", "2010", "2012"], c: 0 },
+              { q: "¿En qué año se fundó River Plate?", a: ["1901", "1905", "1898"], c: 0 },
+              { q: "¿Cuántas Champions League ganó el AC Milan?", a: ["7", "5", "6"], c: 0 },
+              { q: "¿En qué año se fundó Boca Juniors?", a: ["1905", "1901", "1910"], c: 0 },
+              { q: "¿Qué club inglés tiene más Champions?", a: ["Liverpool", "Manchester United", "Chelsea"], c: 0 },
+              { q: "¿En qué ciudad juega la Juventus?", a: ["Turín", "Milán", "Roma"], c: 0 },
+              { q: "¿Cuál fue el primer álbum de Led Zeppelin?", a: ["Led Zeppelin", "Led Zeppelin II", "Led Zeppelin III"], c: 0 }
+            ],
+            siQueSaben: [
+              { q: "¿En qué año debutó Maradona en Primera?", a: ["1976", "1975", "1977"], c: 0 },
+              { q: "¿Cuántos goles oficiales tiene Pelé?", a: ["757", "1000", "1283"], c: 0 },
+              { q: "¿Quién fue el primer ganador del Balón de Oro?", a: ["Stanley Matthews", "Alfredo Di Stéfano", "Raymond Kopa"], c: 0 },
+              { q: "¿En qué año se fundó la UEFA?", a: ["1954", "1950", "1958"], c: 0 },
+              { q: "¿Primer DT campeón del mundo como jugador y DT?", a: ["Mário Zagallo", "Franz Beckenbauer", "Didier Deschamps"], c: 0 },
+              { q: "¿Primer club en ganar 3 Champions consecutivas era moderna?", a: ["Real Madrid", "AC Milan", "Bayern Munich"], c: 0 },
+              { q: "¿Cuántos años dirigió Ferguson al Manchester United?", a: ["27", "25", "30"], c: 0 },
+              { q: "¿En qué año Independiente ganó su primera Libertadores?", a: ["1964", "1965", "1963"], c: 0 },
+              { q: "¿Quién fue el primer sudamericano Balón de Oro?", a: ["Omar Sívori", "Alfredo Di Stéfano", "Pelé"], c: 0 },
+              { q: "¿En qué Mundial Maradona no jugó por dopaje?", a: ["1994", "1990", "1998"], c: 0 },
+              { q: "¿Qué DT ganó Champions con dos clubes diferentes?", a: ["José Mourinho", "Carlo Ancelotti", "Pep Guardiola"], c: 0 },
+              { q: "¿En qué año Menotti ganó el Mundial con Argentina?", a: ["1978", "1979", "1977"], c: 0 },
+              { q: "¿Quién fue el DT de Brasil en el Mundial 2002?", a: ["Luiz Felipe Scolari", "Carlos Alberto Parreira", "Mário Zagallo"], c: 0 },
+              { q: "¿Qué DT italiano ganó el Mundial 2006?", a: ["Marcello Lippi", "Cesare Maldini", "Arrigo Sacchi"], c: 0 },
+              { q: "¿En qué año Guardiola asumió en el Manchester City?", a: ["2016", "2015", "2017"], c: 0 },
+              { q: "¿Primer jugador argentino en ganar Balón de Oro?", a: ["Omar Sívori", "Alfredo Di Stéfano", "Diego Maradona"], c: 0 },
+              { q: "¿En qué año Messi debutó en Barcelona?", a: ["2004", "2003", "2005"], c: 0 },
+              { q: "¿Cuántos goles hizo Messi en el año 2012?", a: ["91", "86", "73"], c: 0 },
+              { q: "¿Qué club tiene más Copas Intercontinentales?", a: ["Real Madrid", "Boca Juniors", "AC Milan"], c: 0 },
+              { q: "¿En qué año se fundó la Copa Libertadores?", a: ["1960", "1959", "1961"], c: 0 },
+              { q: "¿Primer club argentino en ganar la Libertadores?", a: ["Independiente", "Racing", "River Plate"], c: 0 },
+              { q: "¿En qué año el Real Madrid ganó su primera Champions?", a: ["1956", "1955", "1957"], c: 0 },
+              { q: "¿En qué año se jugó el primer Mundial?", a: ["1930", "1928", "1932"], c: 0 },
+              { q: "¿Dónde se jugó el primer Mundial?", a: ["Uruguay", "Italia", "Francia"], c: 0 },
+              { q: "¿Qué DT español ganó la Champions con el Liverpool?", a: ["Rafael Benítez", "Luis Enrique", "Pep Guardiola"], c: 0 }
+            ]
+          }
+        };
+        function App() {
+          const [gameState, setGameState] = useState('setup');
+          const [players, setPlayers] = useState([]);
+          const [newPlayerName, setNewPlayerName] = useState('');
+          const [difficulty, setDifficulty] = useState('');
+          const [currentRound, setCurrentRound] = useState(0);
+          const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+          const [currentQuestion, setCurrentQuestion] = useState(null);
+          const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+          const [selectedAnswer, setSelectedAnswer] = useState(null);
+          const [showAnswer, setShowAnswer] = useState(false);
+          const [usedQuestions, setUsedQuestions] = useState([]);
+          const [streak, setStreak] = useState({});
+
+          useEffect(() => {
+            if (gameState === 'playing' && !showAnswer && timeLeft > 0) {
+              const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+              return () => clearTimeout(timer);
+            }
+            if (timeLeft === 0 && !showAnswer) {
+              handleTimeout();
+            }
+          }, [timeLeft, gameState, showAnswer]);
+
+          const addPlayer = () => {
+            if (newPlayerName.trim()) {
+              setPlayers([...players, { name: newPlayerName.trim(), score: 0, correct: 0, total: 0 }]);
+              setNewPlayerName('');
+            }
+          };
+
+          const startGame = () => {
+            if (players.length > 0 && difficulty) {
+              const initialStreak = {};
+              players.forEach(p => initialStreak[p.name] = 0);
+              setStreak(initialStreak);
+              setGameState('playing');
+              nextQuestion();
+            }
+          };
+
+          const nextQuestion = () => {
+            const category = currentRound % 2 === 0 ? 'musica' : 'futbol';
+            const questions = questionBank[category][difficulty];
+            const availableQuestions = questions.filter((_, idx) => !usedQuestions.includes(`${category}-${difficulty}-${idx}`));
+            
+            if (availableQuestions.length === 0) {
+              setUsedQuestions([]);
+              return nextQuestion();
+            }
+
+            const randomQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+            const questionId = `${category}-${difficulty}-${questions.indexOf(randomQuestion)}`;
+            
+            const correctAnswer = randomQuestion.a[randomQuestion.c];
+            const shuffledAnswers = [...randomQuestion.a].sort(() => Math.random() - 0.5);
+            const newCorrectIndex = shuffledAnswers.indexOf(correctAnswer);
+            
+            const shuffledQuestion = {
+              ...randomQuestion,
+              a: shuffledAnswers,
+              c: newCorrectIndex
+            };
+            
+            setCurrentQuestion(shuffledQuestion);
+            setUsedQuestions([...usedQuestions, questionId]);
+            setTimeLeft(TIMER_DURATION);
+            setSelectedAnswer(null);
+            setShowAnswer(false);
+          };
+
+          const handleAnswer = (answerIndex) => {
+            if (showAnswer) return;
+            
+            setSelectedAnswer(answerIndex);
+            setShowAnswer(true);
+
+            const isCorrect = answerIndex === currentQuestion.c;
+            const timeBonus = timeLeft > 15 ? 3 : timeLeft > 10 ? 2 : 1;
+
+            const newPlayers = [...players];
+            const currentPlayer = newPlayers[currentPlayerIndex];
+            
+            currentPlayer.total++;
+            
+            if (isCorrect) {
+              currentPlayer.correct++;
+              const currentStreak = streak[currentPlayer.name] || 0;
+              const newStreak = timeLeft > 15 ? currentStreak + 1 : 0;
+              
+              let points = timeBonus;
+              if (newStreak === 3 && timeLeft > 15) {
+                points = 6;
+                setStreak({ ...streak, [currentPlayer.name]: 0 });
+              } else {
+                setStreak({ ...streak, [currentPlayer.name]: newStreak });
+              }
+              
+              currentPlayer.score += points;
+            } else {
+              setStreak({ ...streak, [currentPlayer.name]: 0 });
+            }
+
+            setPlayers(newPlayers);
+            setTimeout(() => moveToNextTurn(), 3000);
+          };
+
+          const handleTimeout = () => {
+            setShowAnswer(true);
+            const newPlayers = [...players];
+            newPlayers[currentPlayerIndex].total++;
+            setPlayers(newPlayers);
+            setStreak({ ...streak, [players[currentPlayerIndex].name]: 0 });
+            setTimeout(() => moveToNextTurn(), 3000);
+          };
+
+          const moveToNextTurn = () => {
+            const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            
+            if (nextPlayerIndex === 0) {
+              const nextRound = currentRound + 1;
+              if (nextRound >= TOTAL_ROUNDS) {
+                setGameState('results');
+                return;
+              }
+              setCurrentRound(nextRound);
+            }
+
+            setCurrentPlayerIndex(nextPlayerIndex);
+            nextQuestion();
+          };
+
+          const resetGame = () => {
+            setGameState('setup');
+            setPlayers([]);
+            setCurrentRound(0);
+            setCurrentPlayerIndex(0);
+            setUsedQuestions([]);
+            setDifficulty('');
+          };
+          if (gameState === 'setup') {
+            return (
+              <div className="min-h-screen p-8 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-12">
+                    <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                      Trivia Pasión: Música y Gol
+                    </h1>
+                    <div className="flex justify-center gap-8 mt-6">
+                      <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur">
+                        <span className="text-4xl">🎸</span>
+                        <span className="text-white font-bold text-xl">Música</span>
+                      </div>
+                      <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur">
+                        <span className="text-4xl">⚽</span>
+                        <span className="text-white font-bold text-xl">Fútbol</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
+                    <h2 className="text-3xl font-bold mb-6 text-purple-900 flex items-center gap-3">
+                      <span className="text-4xl">👥</span>
+                      Jugadores
+                    </h2>
+                    
+                    <div className="flex gap-3 mb-6">
+                      <input
+                        type="text"
+                        value={newPlayerName}
+                        onChange={(e) => setNewPlayerName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addPlayer()}
+                        placeholder="Nombre del jugador"
+                        className="flex-1 px-4 py-3 border-2 border-purple-300 rounded-xl focus:outline-none focus:border-purple-500 text-lg"
+                      />
+                      <button
+                        onClick={addPlayer}
+                        className="px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                      >
+                        Agregar
+                      </button>
+                    </div>
+
+                    {players.length > 0 && (
+                      <div className="space-y-2 mb-6">
+                        {players.map((player, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-3 rounded-xl">
+                            <span className="font-bold text-purple-900 text-lg">
+                              {idx + 1}. {player.name}
+                            </span>
+                            <button
+                              onClick={() => setPlayers(players.filter((_, i) => i !== idx))}
+                              className="text-red-500 hover:text-red-700 font-bold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-8">
+                    <h2 className="text-3xl font-bold mb-6 text-purple-900 flex items-center gap-3">
+                      <span className="text-4xl">🏆</span>
+                      Nivel de Dificultad
+                    </h2>
+                    
+                    <div className="grid gap-4">
+                      {[
+                        { value: 'paraBurros', label: 'Para Burros', desc: 'Nivel fácil' },
+                        { value: 'gentePromedio', label: 'Gente Promedio', desc: 'Nivel intermedio' },
+                        { value: 'siQueSaben', label: 'Si Que Saben!!!', desc: 'Nivel difícil' }
+                      ].map(level => (
+                        <button
+                          key={level.value}
+                          onClick={() => setDifficulty(level.value)}
+                          className={`p-6 rounded-xl border-4 transition-all text-left ${
+                            difficulty === level.value
+                              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-purple-800 scale-105'
+                              : 'bg-white border-purple-300 hover:border-purple-500'
+                          }`}
+                        >
+                          <div className="text-2xl font-bold mb-1">{level.label}</div>
+                          <div className={`text-sm ${difficulty === level.value ? 'text-purple-100' : 'text-gray-600'}`}>
+                            {level.desc}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {players.length > 0 && difficulty && (
+                    <button
+                      onClick={startGame}
+                      className="w-full py-6 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-3xl font-bold text-3xl hover:scale-105 transition-transform shadow-2xl flex items-center justify-center gap-4"
+                    >
+                      <span className="text-5xl">▶️</span>
+                      ¡COMENZAR JUEGO!
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          }
+if (gameState === 'playing' && currentQuestion) {
+            const currentPlayer = players[currentPlayerIndex];
+            const category = currentRound % 2 === 0 ? 'Música' : 'Fútbol';
+
+            return (
+              <div className="min-h-screen p-8 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 mb-6">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-sm text-gray-600 mb-1">Ronda {currentRound + 1} de {TOTAL_ROUNDS}</div>
+                        <div className="text-3xl font-bold text-purple-900 flex items-center gap-3">
+                          <span className="text-4xl">{category === 'Música' ? '🎸' : '⚽'}</span>
+                          {currentPlayer.name}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-5xl font-bold text-purple-900">{currentPlayer.score}</div>
+                        <div className="text-sm text-gray-600">puntos</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">⏱️</span>
+                        <span className="font-bold text-gray-700">Tiempo</span>
+                      </div>
+                      <span className={`text-4xl font-bold ${timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-purple-900'}`}>
+                        {timeLeft}s
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-1000 ${
+                          timeLeft > 15 ? 'bg-green-500' :
+                          timeLeft > 10 ? 'bg-yellow-500' :
+                          timeLeft > 5 ? 'bg-orange-500' : 'bg-red-500'
+                        }`}
+                        style={{ width: `${(timeLeft / TIMER_DURATION) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-6 min-h-[300px]">
+                    <div className={`inline-block px-4 py-2 rounded-full mb-6 ${
+                      category === 'Música' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                    }`}>
+                      <span className="font-bold">{category}</span>
+                    </div>
+                    
+                    <h3 className="text-3xl font-bold text-gray-900 mb-8 leading-relaxed">
+                      {currentQuestion.q}
+                    </h3>
+
+                    <div className="space-y-4">
+                      {currentQuestion.a.map((answer, idx) => {
+                        const isCorrect = idx === currentQuestion.c;
+                        const isSelected = idx === selectedAnswer;
+                        
+                        let bgColor = 'bg-gradient-to-r from-purple-100 to-pink-100 border-purple-300';
+                        if (showAnswer) {
+                          if (isCorrect) {
+                            bgColor = 'bg-gradient-to-r from-green-400 to-green-600 border-green-700 text-white';
+                          } else if (isSelected) {
+                            bgColor = 'bg-gradient-to-r from-red-400 to-red-600 border-red-700 text-white';
+                          } else {
+                            bgColor = 'bg-gray-200 border-gray-400 text-gray-600';
+                          }
+                        }
+
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleAnswer(idx)}
+                            disabled={showAnswer}
+                            className={`w-full p-5 rounded-xl border-4 text-left font-bold text-lg transition-all ${bgColor} ${
+                              !showAnswer && 'hover:scale-102 hover:shadow-lg'
+                            }`}
+                          >
+                            {answer}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6">
+                    <h3 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">🏆</span>
+                      Tabla de Posiciones
+                    </h3>
+                    <div className="space-y-2">
+                      {[...players].sort((a, b) => b.score - a.score).map((player, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex justify-between items-center p-3 rounded-xl ${
+                            player.name === currentPlayer.name ? 'bg-purple-100' : 'bg-gray-50'
+                          }`}
+                        >
+                          <span className="font-bold text-gray-900">
+                            {idx + 1}. {player.name}
+                          </span>
+                          <span className="font-bold text-purple-900">{player.score} pts</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+if (gameState === 'results') {
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            
+            return (
+              <div className="min-h-screen p-8 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
+                <div className="max-w-4xl mx-auto">
+                  <div className="text-center mb-8">
+                    <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                      ¡Juego Terminado!
+                    </h1>
+                  </div>
+
+                  <div className="bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-8 mb-6">
+                    <div className="text-center mb-8">
+                      <div className="text-8xl mb-4">🏆</div>
+                      <h2 className="text-4xl font-bold text-purple-900 mb-2">¡Ganador!</h2>
+                      <div className="text-6xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                        {sortedPlayers[0].name}
+                      </div>
+                      <div className="text-3xl font-bold text-purple-600 mt-2">
+                        {sortedPlayers[0].score} puntos
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mb-8">
+                      {sortedPlayers.map((player, idx) => {
+                        const percentage = player.total > 0 ? Math.round((player.correct / player.total) * 100) : 0;
+                        
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-6 rounded-xl ${
+                              idx === 0 ? 'bg-gradient-to-r from-yellow-100 to-orange-100 border-4 border-yellow-400' :
+                              idx === 1 ? 'bg-gradient-to-r from-gray-100 to-gray-200 border-4 border-gray-400' :
+                              idx === 2 ? 'bg-gradient-to-r from-orange-100 to-orange-200 border-4 border-orange-400' :
+                              'bg-gray-50 border-2 border-gray-300'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center mb-3">
+                              <div className="flex items-center gap-4">
+                                <div
+                                  className={`text-4xl font-bold ${
+                                    idx === 0 ? 'text-yellow-600' :
+                                    idx === 1 ? 'text-gray-600' :
+                                    idx === 2 ? 'text-orange-600' :
+                                    'text-gray-500'
+                                  }`}
+                                >
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <div className="text-2xl font-bold text-gray-900">{player.name}</div>
+                                  <div className="text-sm text-gray-600">
+                                    {player.correct} de {player.total} correctas
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-4xl font-bold text-purple-900">{player.score}</div>
+                                <div className="text-sm text-gray-600">{percentage}% aciertos</div>
+                              </div>
+                            </div>
+                            
+                            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={resetGame}
+                      className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-transform"
+                    >
+                      Jugar de Nuevo
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        }
+ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
